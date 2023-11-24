@@ -97,6 +97,8 @@ static KeyboardReport keyboardReport
 
 Gamepad::Gamepad() :
 	debouncer()
+	, hasAnalogTriggers(true)
+	, hasLeftAnalogStick(true)
 	, options(Storage::getInstance().getGamepadOptions())
 	, hotkeyOptions(Storage::getInstance().getHotkeyOptions())
 {}

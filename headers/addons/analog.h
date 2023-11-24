@@ -10,15 +10,15 @@
 #include "enums.pb.h"
 
 #ifndef ANALOG_INPUT_ENABLED
-#define ANALOG_INPUT_ENABLED 0
+#define ANALOG_INPUT_ENABLED 1
 #endif
 
 #ifndef ANALOG_ADC_1_VRX
-#define ANALOG_ADC_1_VRX    -1
+#define ANALOG_ADC_1_VRX    27
 #endif
 
 #ifndef ANALOG_ADC_1_VRY
-#define ANALOG_ADC_1_VRY    -1
+#define ANALOG_ADC_1_VRY    26
 #endif
 
 #ifndef ANALOG_ADC_1_MODE
@@ -62,6 +62,7 @@
 
 class AnalogInput : public GPAddon {
 public:
+	AnalogInput();
 	virtual bool available();
 	virtual void setup();       // Analog Setup
 	virtual void process();     // Analog Process

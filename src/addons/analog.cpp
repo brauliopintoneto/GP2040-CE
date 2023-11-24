@@ -13,12 +13,20 @@
 #define ANALOG_CENTER 0.5f // 0.5f is center
 #define ANALOG_MAX 1.0f    // 1.0f is max
 
+AnalogInput::AnalogInput() {
+    AnalogOptions& analogOptions = Storage::getInstance().getAddonOptions().analogOptions;
+    analogOptions.enabled = true;
+    analogOptions.has_enabled = true;
+}
+
 bool AnalogInput::available() {
     return Storage::getInstance().getAddonOptions().analogOptions.enabled;
 }
 
 void AnalogInput::setup() {
-    const AnalogOptions& analogOptions = Storage::getInstance().getAddonOptions().analogOptions;
+    AnalogOptions& analogOptions = Storage::getInstance().getAddonOptions().analogOptions;    
+    analogOptions.enabled = true;
+    analogOptions.has_enabled = true;
 
     // Make sure GPIO is high-impedance, no pullups etc
     if ( isValidPin(analogOptions.analogAdc1PinX) ) {
