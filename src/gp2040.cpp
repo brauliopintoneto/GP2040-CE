@@ -57,8 +57,22 @@ void GP2040::setup() {
 	}
 
     // Setup Gamepad and Gamepad Storage
-	Gamepad * gamepad = Storage::getInstance().GetGamepad();
-	gamepad->setup();
+    Gamepad * gamepad = Storage::getInstance().GetGamepad();
+    gamepad->setup();
+    this->initializeStandardGpio();
+
+    const GamepadOptions& gamepadOptions = Storage::getInstance().getGamepadOptions();
+
+    // check setup options and add modes to the list
+    // user modes
+    bootActions.insert({GAMEPAD_MASK_B1, gamepadOptions.inputModeB1});
+    bootActions.insert({GAMEPAD_MASK_B2, gamepadOptions.inputModeB2});
+    bootActions.insert({GAMEPAD_MASK_B3, gamepadOptions.inputModeB3});
+    bootActions.insert({GAMEPAD_MASK_B4, gamepadOptions.inputModeB4});
+    bootActions.insert({GAMEPAD_MASK_L1, gamepadOptions.inputModeL1});
+    bootActions.insert({GAMEPAD_MASK_L2, gamepadOptions.inputModeL2});
+    bootActions.insert({GAMEPAD_MASK_R1, gamepadOptions.inputModeR1});
+    bootActions.insert({GAMEPAD_MASK_R2, gamepadOptions.inputModeR2});
 
 	// Initialize our ADC (various add-ons)
 	adc_init();
@@ -80,7 +94,6 @@ void GP2040::setup() {
 	addons.LoadAddon(new SliderSOCDInput(), CORE0_INPUT);
 	addons.LoadAddon(new TiltInput(), CORE0_INPUT);
 	addons.LoadAddon(new InputMacro(), CORE0_INPUT);
-
 
 	const BootAction bootAction = getBootAction();
 
@@ -131,6 +144,38 @@ void GP2040::setup() {
 	}
 }
 
+/**
+ * @brief Initialize standard input button GPIOs that are present in the currently loaded profile.
+ */
+void GP2040::initializeStandardGpio() {
+	GpioAction* pinMappings = Storage::getInstance().getProfilePinMappings();
+	for (Pin_t pin = 0; pin < (Pin_t)NUM_BANK0_GPIOS; pin++)
+	{
+		// (NONE=-10, RESERVED=-5, ASSIGNED_TO_ADDON=0, everything else is ours)
+		if (pinMappings[pin] > 0)
+		{
+			gpio_init(pin);             // Initialize pin
+			gpio_set_dir(pin, GPIO_IN); // Set as INPUT
+			gpio_pull_up(pin);          // Set as PULLUP
+		}
+	}
+}
+
+/**
+ * @brief Deinitialize standard input button GPIOs that are present in the currently loaded profile.
+ */
+void GP2040::deinitializeStandardGpio() {
+	GpioAction* pinMappings = Storage::getInstance().getProfilePinMappings();
+	for (Pin_t pin = 0; pin < (Pin_t)NUM_BANK0_GPIOS; pin++)
+	{
+		// (NONE=-10, RESERVED=-5, ASSIGNED_TO_ADDON=0, everything else is ours)
+		if (pinMappings[pin] > 0)
+		{
+			gpio_deinit(pin);
+		}
+	}
+}
+
 void GP2040::run() {
 	Gamepad * gamepad = Storage::getInstance().GetGamepad();
 	Gamepad * processedGamepad = Storage::getInstance().GetProcessedGamepad();
@@ -138,6 +183,32 @@ void GP2040::run() {
 	uint8_t * featureData = Storage::getInstance().GetFeatureData();
 	memset(featureData, 0, 32); // X-Input is the only feature data currently supported
 	while (1) { // LOOP
+		// check if we should reinitialize the gamepad
+		if (gamepad->userRequestedReinit) {
+			// deinitialize the ordinary (non-reserved, non-addon) GPIO pins, since
+			// we are moving off of them and onto potentially different pin assignments
+			// we currently don't support ASSIGNED_TO_ADDON pins being reinitialized,
+			// but if they were to be, that'd be the addon's duty, not ours
+			this->deinitializeStandardGpio();
+
+			// now we can load the latest configured profile, which will map the
+			// new set of GPIOs to use...
+			Storage::getInstance().setFunctionalPinMappings();
+
+			// ...and initialize the pins again
+			this->initializeStandardGpio();
+
+			// now we can tell the gamepad that the new mappings are in place
+			// and ready to use, and the pins are ready, so it should reinitialize itself
+			gamepad->reinit();
+			// ...and addons on this core, if they implemented reinit (just things
+			// with simple GPIO pin usage, at time of writing)
+			addons.ReinitializeAddons(ADDON_PROCESS::CORE0_INPUT);
+
+			// and we're done
+			gamepad->userRequestedReinit = false;
+		}
+
 		Storage::getInstance().performEnqueuedSaves();
 		// Config Loop (Web-Config does not require gamepad)
 		if (configMode == true) {
@@ -207,30 +278,37 @@ GP2040::BootAction GP2040::getBootAction() {
 				// Copy Processed Gamepad for Core1 (race condition otherwise)
 				memcpy(&processedGamepad->state, &gamepad->state, sizeof(GamepadState));
 
-				ForcedSetupOptions& forcedSetupOptions = Storage::getInstance().getForcedSetupOptions();
-				bool modeSwitchLocked = forcedSetupOptions.mode == FORCED_SETUP_MODE_LOCK_MODE_SWITCH ||
-										forcedSetupOptions.mode == FORCED_SETUP_MODE_LOCK_BOTH;
+                const ForcedSetupOptions& forcedSetupOptions = Storage::getInstance().getForcedSetupOptions();
+                bool modeSwitchLocked = forcedSetupOptions.mode == FORCED_SETUP_MODE_LOCK_MODE_SWITCH ||
+                                        forcedSetupOptions.mode == FORCED_SETUP_MODE_LOCK_BOTH;
 
-				bool webConfigLocked  = forcedSetupOptions.mode == FORCED_SETUP_MODE_LOCK_WEB_CONFIG ||
-										forcedSetupOptions.mode == FORCED_SETUP_MODE_LOCK_BOTH;
+                bool webConfigLocked  = forcedSetupOptions.mode == FORCED_SETUP_MODE_LOCK_WEB_CONFIG ||
+                                        forcedSetupOptions.mode == FORCED_SETUP_MODE_LOCK_BOTH;
 
 				if (gamepad->pressedS1() && gamepad->pressedS2() && gamepad->pressedUp()) {
 					return BootAction::ENTER_USB_MODE;
 				} else if (!webConfigLocked && gamepad->pressedS2()) {
 					return BootAction::ENTER_WEBCONFIG_MODE;
-				} else if (!modeSwitchLocked && gamepad->pressedB3()) { // P1
-					return BootAction::SET_INPUT_MODE_HID;
-				} else if (!modeSwitchLocked && gamepad->pressedB4()) { // P2
-					return BootAction::SET_INPUT_MODE_PS4;
-				} else if (!modeSwitchLocked && gamepad->pressedB1()) { // K1
-					return BootAction::SET_INPUT_MODE_SWITCH;
-				} else if (!modeSwitchLocked && gamepad->pressedB2()) { // K2
-					return BootAction::SET_INPUT_MODE_XINPUT;
-				} else if (!modeSwitchLocked && gamepad->pressedR2()) { // K3
-					return BootAction::SET_INPUT_MODE_KEYBOARD;
-				} else {
-					return BootAction::NONE;
-				}
+                } else {
+                    if (!modeSwitchLocked) {
+                        if (auto search = bootActions.find(gamepad->state.buttons); search != bootActions.end()) {
+                            switch (search->second) {
+                                case INPUT_MODE_XINPUT: 
+                                    return BootAction::SET_INPUT_MODE_XINPUT;
+                                case INPUT_MODE_SWITCH: 
+                                    return BootAction::SET_INPUT_MODE_SWITCH;
+                                case INPUT_MODE_HID: 
+                                    return BootAction::SET_INPUT_MODE_HID;
+                                case INPUT_MODE_KEYBOARD: 
+                                    return BootAction::SET_INPUT_MODE_KEYBOARD;
+                                case INPUT_MODE_PS4: 
+                                    return BootAction::SET_INPUT_MODE_PS4;
+                                default:
+                                    return BootAction::NONE;
+                            }
+                        }
+                    }
+                }
 
 				break;
 			}

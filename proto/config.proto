@@ -16,6 +16,14 @@ message GamepadOptions
 	optional uint32 profileNumber = 9;
 	optional PS4ControllerType ps4ControllerType = 10;
 	optional uint32 debounceDelay = 11;
+    optional int32 inputModeB1 = 12;
+    optional int32 inputModeB2 = 13;
+    optional int32 inputModeB3 = 14;
+    optional int32 inputModeB4 = 15;
+    optional int32 inputModeL1 = 16;
+    optional int32 inputModeL2 = 17;
+    optional int32 inputModeR1 = 18;
+    optional int32 inputModeR2 = 19;
 }
 
 message KeyboardMapping
@@ -62,6 +70,10 @@ message HotkeyOptions
 	optional HotkeyEntry hotkey10 = 10;
 	optional HotkeyEntry hotkey11 = 11;
 	optional HotkeyEntry hotkey12 = 12;
+	optional HotkeyEntry hotkey13 = 13;
+	optional HotkeyEntry hotkey14 = 14;
+	optional HotkeyEntry hotkey15 = 15;
+	optional HotkeyEntry hotkey16 = 16;
 }
 
 message PeripheralOptions
@@ -179,7 +191,8 @@ message AlternativePinMappings
 
 message ProfileOptions
 {
-	repeated AlternativePinMappings alternativePinMappings = 1 [(nanopb).max_count = 3];
+	repeated AlternativePinMappings deprecatedAlternativePinMappings = 1 [(nanopb).max_count = 3];
+	repeated GpioMappings gpioMappingsSets = 2 [(nanopb).max_count = 3];
 }
 
 message DisplayOptions
@@ -697,6 +710,7 @@ message MigrationHistory
 {
 	optional bool hotkeysMigrated = 1 [default = false];
 	optional bool gpioMappingsMigrated = 2 [default = false];
+	optional bool buttonProfilesMigrated = 3 [default = false];
 }
 
 message Config
