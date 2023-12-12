@@ -11,6 +11,7 @@
 #include "GamepadConfig.h"
 #include "helper.h"
 #include "addons/analog.h"
+// #include "addons/accelerometer.h"
 #include "addons/board_led.h"
 #include "addons/bootsel_button.h"
 #include "addons/buzzerspeaker.h"
@@ -389,10 +390,18 @@ void ConfigUtils::initUnsetPropertiesWithDefaults(Config& config)
     INIT_UNSET_PROPERTY(config.addonOptions.analogOptions, analogAdc2PinY, ANALOG_ADC_2_VRY);
     INIT_UNSET_PROPERTY(config.addonOptions.analogOptions, analogAdc2Mode, ANALOG_ADC_2_MODE);
     INIT_UNSET_PROPERTY(config.addonOptions.analogOptions, analogAdc2Invert, ANALOG_ADC_2_INVERT);
-    INIT_UNSET_PROPERTY(config.addonOptions.analogOptions, forced_circularity, !!FORCED_CIRCULARITY_ENABLED);
-    INIT_UNSET_PROPERTY(config.addonOptions.analogOptions, analog_deadzone, DEFAULT_ANALOG_DEADZONE);
-    INIT_UNSET_PROPERTY(config.addonOptions.analogOptions, auto_calibrate, AUTO_CALIBRATE_ENABLED);
 
+    // Init Gyroscope values to ADXL335 -> 
+    // 34(GP28) - ADC2;
+    // 33(GND)  - AGND;
+    // 32(GP27) - ADC1; - I2C1 SCL
+    // 31(GP26) - ADC0; - I2C1 SDA
+/* 
+    INIT_UNSET_PROPERTY(config.addonOptions.accelerometerOptions, enabled, !!ACCELEROMETER_INPUT_ENABLED);    
+    INIT_UNSET_PROPERTY(config.addonOptions.accelerometerOptions, accelerometer1PinX, ACCELEROMETER_ADC_1_VRX);
+    INIT_UNSET_PROPERTY(config.addonOptions.accelerometerOptions, accelerometer1PinY, ACCELEROMETER_ADC_1_VRY);
+    INIT_UNSET_PROPERTY(config.addonOptions.accelerometerOptions, accelerometer1Mode, ACCELEROMETER_ADC_1_MODE);
+*/
     // addonOptions.turboOptions
     INIT_UNSET_PROPERTY(config.addonOptions.turboOptions, enabled, !!TURBO_ENABLED);
     INIT_UNSET_PROPERTY(config.addonOptions.turboOptions, buttonPin, PIN_BUTTON_TURBO);

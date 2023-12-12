@@ -951,6 +951,12 @@ bool ConfigUtils::fromLegacyStorage(Config& config)
         SET_PROPERTY(analogOptions, analogAdc1PinX, bytePinToIntPin(legacyAddonOptions.analogAdcPinX));
         SET_PROPERTY(analogOptions, analogAdc1PinY, bytePinToIntPin(legacyAddonOptions.analogAdcPinY));
 
+        /*AccelerometerOptions& accelerometerOptions = config.addonOptions.accelerometerOptions;
+        config.addonOptions.has_accelerometerOptions = true;
+        SET_PROPERTY(analogOptions, enabled, legacyAddonOptions.AnalogInputEnabled);
+        SET_PROPERTY(analogOptions, analogAdc1PinX, bytePinToIntPin(legacyAddonOptions.analogAdcPinX));
+        SET_PROPERTY(analogOptions, analogAdc1PinY, bytePinToIntPin(legacyAddonOptions.analogAdcPinY));
+*/
         BootselButtonOptions& bootselButtonOptions = config.addonOptions.bootselButtonOptions;
         config.addonOptions.has_bootselButtonOptions = true;
         SET_PROPERTY(bootselButtonOptions, enabled, legacyAddonOptions.BootselButtonAddonEnabled);

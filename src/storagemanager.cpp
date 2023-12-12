@@ -16,6 +16,7 @@
 #include "types.h"
 
 #include "addons/analog.h"
+#include "addons/accelerometer.h"
 #include "addons/board_led.h"
 #include "addons/bootsel_button.h"
 #include "addons/buzzerspeaker.h"

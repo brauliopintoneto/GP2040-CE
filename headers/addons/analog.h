@@ -25,37 +25,6 @@
 #define ANALOG_ADC_1_MODE DPAD_MODE_LEFT_ANALOG
 #endif
 
-#ifndef ANALOG_ADC_1_INVERT
-#define ANALOG_ADC_1_INVERT INVERT_NONE
-#endif
-
-#ifndef ANALOG_ADC_2_VRX
-#define ANALOG_ADC_2_VRX    -1
-#endif
-
-#ifndef ANALOG_ADC_2_VRY
-#define ANALOG_ADC_2_VRY    -1
-#endif
-
-#ifndef ANALOG_ADC_2_MODE
-#define ANALOG_ADC_2_MODE DPAD_MODE_RIGHT_ANALOG
-#endif
-
-#ifndef ANALOG_ADC_2_INVERT
-#define ANALOG_ADC_2_INVERT INVERT_NONE
-#endif
-
-#ifndef FORCED_CIRCULARITY_ENABLED
-#define FORCED_CIRCULARITY_ENABLED 0
-#endif
-
-#ifndef DEFAULT_ANALOG_DEADZONE
-#define DEFAULT_ANALOG_DEADZONE 5
-#endif
-
-#ifndef AUTO_CALIBRATE_ENABLED
-#define AUTO_CALIBRATE_ENABLED 0
-#endif
 
 // Analog Module Name
 #define AnalogName "Analog"

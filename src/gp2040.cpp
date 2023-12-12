@@ -11,6 +11,7 @@
 #include "usbhostmanager.h"
 
 #include "addons/analog.h" // Inputs for Core0
+// #include "addons/accelerometer.h" 
 #include "addons/bootsel_button.h"
 #include "addons/focus_mode.h"
 #include "addons/dualdirectional.h"
@@ -65,6 +66,7 @@ void GP2040::setup() {
 	// Setup Add-ons
 	addons.LoadUSBAddon(new KeyboardHostAddon(), CORE0_INPUT);
 	addons.LoadAddon(new AnalogInput(), CORE0_INPUT);
+	// addons.LoadAddon(new AccelerometerInput(), CORE0_INPUT);
 	addons.LoadAddon(new BootselButtonAddon(), CORE0_INPUT);
 	addons.LoadAddon(new DualDirectionalInput(), CORE0_INPUT);
 	addons.LoadAddon(new FocusModeAddon(), CORE0_INPUT);

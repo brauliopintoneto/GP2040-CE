@@ -60,7 +60,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /home/bnetogil/Development/Projects/DevTitans/ProjectFinal/GP2040-CE
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/bnetogil/Development/Projects/DevTitans/ProjectFinal/GP2040-CE/build
+CMAKE_BINARY_DIR = /home/bnetogil/Development/Projects/DevTitans/ProjectFinal/GP2040-CE
 
 #=============================================================================
 # Targets provided globally by CMake.

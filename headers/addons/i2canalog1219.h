@@ -42,9 +42,9 @@ typedef struct {
 class I2CAnalog1219Input : public GPAddon {
 public:
 	virtual bool available();
-	virtual void setup();       // Analog Setup
-	virtual void preprocess() {}
+	virtual void setup();       // Analog Setup	
 	virtual void process();     // Analog Process
+	virtual void preprocess() {}
     virtual std::string name() { return I2CAnalog1219Name; }
 private:
     ADS1219 * ads;
