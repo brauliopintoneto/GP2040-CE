@@ -137,8 +137,8 @@
 // The default for `ANALOG_ADC_VRX` and `ANALOG_ADC_VRY` is `-1` which disables them.
 // To enable a `ANALOG_ADC_VRX` and `ANALOG_ADC_VRY`, replace the `-1` with the GPIO pin numbers that are desired. 
 
-#define ANALOG_ADC_1_VRX -1
-#define ANALOG_ADC_1_VRY -1
+#define ANALOG_ADC_1_VRX 27
+#define ANALOG_ADC_1_VRY 26
 #define ANALOG_ADC_1_MODE DPAD_MODE_LEFT_ANALOG
 #define ANALOG_ADC_1_INVERT INVERT_NONE
 

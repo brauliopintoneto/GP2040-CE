@@ -79,6 +79,7 @@ void GP2040::setup() {
 
 	// Setup Add-ons
 	addons.LoadUSBAddon(new KeyboardHostAddon(), CORE0_INPUT);
+	// TODO: Add #ifndef ACCELEROMETER_INPUT
 	addons.LoadAddon(new AnalogInput(), CORE0_INPUT);
 	// addons.LoadAddon(new AccelerometerInput(), CORE0_INPUT);
 	addons.LoadAddon(new BootselButtonAddon(), CORE0_INPUT);
